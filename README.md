@@ -24,6 +24,7 @@ npm install
  - Used for generating minimaps of nest locations.
  - [Install info](https://github.com/123FLO321/SwiftTileserverCache).
  - Create new `nest-bot` template using info from `nest-bot.json`.
+ - Shout out to Malte for the centering/zoom calculations
  
 
 ## Config Setup
