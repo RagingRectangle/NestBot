@@ -1,0 +1,22 @@
+{
+  "style": "1",
+  "latitude": #(lat),
+  "longitude": #(lon),
+  "zoom": #(zoom),
+  "width": #(width),
+  "height": #(height),
+  "scale": 2,
+  "format": "png",
+  "markers": [
+      #for(nest in nestjson):
+      {
+          "url": "https://raw.githubusercontent.com/whitewillem/PogoAssets/main/uicons/pokemon/#index(nest, 0)_f#index(nest, 1).png",
+          "fallback_url": "https://raw.githubusercontent.com/whitewillem/PogoAssets/main/uicons/pokemon/#index(nest, 0).png",
+          "latitude": #index(nest, 2),
+          "longitude": #index(nest, 3),
+          "width": 30,
+          "height": 30
+      },
+      #endfor
+  ]
+}
