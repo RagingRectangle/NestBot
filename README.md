@@ -11,14 +11,25 @@ Join the Discord server for any help and to keep up with updates: https://discor
  - **Nest generator** (Nest tool such as Fletchling/Nestwatcher/Nestcollector)
 
 
-## Install
+## Install Normal
 ```
 git clone https://github.com/RagingRectangle/NestBot.git
 cd NestBot
-cp config.json.example config.json
+adjust: config.json
 npm install
 ```
+## Install Docker
+```
+git clone https://github.com/RagingRectangle/NestBot.git
+cd NestBot
+adjust: config.json
+add content from docker-compose.example.yml into your docker-compose.yml
+docker-compose build nestbot
+docker-compose up -d nestbot
 
+Logs with:
+docker-compose logs -f -t --tail="1000" nestbot
+```
 
 ## Optional TileServer
  - Used for generating minimaps of nest locations.
@@ -60,6 +71,8 @@ npm install
 
 **replaceUnderscores:** Whether or not to replace underscores in area names with spaces.
 
+**language:** Pokemon Names and Forms translation - possible: en / de / es / fr / it / ru
+
 **footerFormat:** Date/time [format](https://momentjs.com/docs/#/displaying/format/) in footer.
 
 **footerOffset:** Hours to offset in footer.
@@ -71,7 +84,7 @@ npm install
 **emojis:** Same format as Poracle if you'd like to copy custom emojis over for types (Will decrease max number of nests shown).
 
 
-## Usage
+## Usage Normal
 - Start the bot in a console with `node nests.js`.
 - Can (*should*) use PM2 to run instead with `pm2 start nests.js --name NestBot`.
 - Boards will refresh at set cron schedule.
