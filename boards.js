@@ -29,10 +29,12 @@ module.exports = {
     for (var a = 0; a < areaResults.length; a++) {
       var nestInfo = areaResults[a];
       //Pokemon name
-      let pokeInfo = master[`${nestInfo['pokemon_id']}_${nestInfo['pokemon_form']}`];
-      var pokemonName = pokeInfo.name;
+      let pokeInfo = master.monsters[`${nestInfo['pokemon_id']}_${nestInfo['pokemon_form']}`];
+      let pokeNameTranslation = master.translations[config.language].pokemon[`poke_${nestInfo['pokemon_id']}`];
+      let pokeFormTranslation = master.translations[config.language].forms[`form_${nestInfo['pokemon_form']}`];
+      var pokemonName = pokeNameTranslation;
       if (pokeInfo.form.name && !config.ignoredFormNames.includes(pokeInfo.form.name)) {
-        pokemonName = pokemonName.concat(` ${pokeInfo.form.name}`);
+        pokemonName = pokemonName.concat(` ${pokeFormTranslation}`);
         //Remove any ending in form
         if (pokemonName.endsWith(' Form') || pokemonName.endsWith(' Forme')) {
           pokemonName = pokemonName.replace(' Forme', '').replace(' Form', '');
