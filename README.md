@@ -71,7 +71,7 @@ docker-compose logs -f -t --tail="1000" nestbot
 
 **replaceUnderscores:** Whether or not to replace underscores in area names with spaces.
 
-**language:** Pokemon names and form translations - possible: `en` / `de` / `es` / `fr` / `it` / `ru`
+**language:** Pokemon name and form translations - possible: `en` / `de` / `es` / `fr` / `it` / `ru`
 
 **footerFormat:** Date/time [format](https://momentjs.com/docs/#/displaying/format/) in footer.
 
