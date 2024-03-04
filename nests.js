@@ -37,11 +37,11 @@ client.on('ready', async () => {
   }
 
   //Update master
-  request("https://raw.githubusercontent.com/WatWowMap/Masterfile-Generator/master/master-latest-poracle.json", {
+  request("https://raw.githubusercontent.com/WatWowMap/Masterfile-Generator/master/master-latest-poracle-v2.json", {
     json: true
   }, (error, res, body) => {
     if (!error && res.statusCode == 200) {
-      master = body.monsters;
+      master = body;
       updateShinies();
     } else {
       console.log('Error updating master:', error);
