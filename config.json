@@ -22,6 +22,7 @@
   "boardFormat": "#{{dex}} {{pokemon}}{{shiny}} {{type}} ({{avg}}) {{name}}",
   "ignoredFormNames": ["Normal"],
   "replaceUnderscores": true,
+  "language": "en/de/es/fr/it/ru",
   "footerFormat": "llll",
   "footerOffset": 0,
   "tileServerURL": "",
