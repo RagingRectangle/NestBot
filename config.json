@@ -8,7 +8,7 @@
     "database": ""
   },
   "adminIDs": [""],
-  "updateCron": "0 */3 * * *",
+  "refreshCron": "0 */3 * * *",
   "nestBoardCommand": "nests",
   "nestBoardOrder": "pokemon_id",
   "includeUnknown": true,
