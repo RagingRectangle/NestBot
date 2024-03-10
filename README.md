@@ -15,14 +15,14 @@ Join the Discord server for any help and to keep up with updates: https://discor
 ```
 git clone https://github.com/RagingRectangle/NestBot.git
 cd NestBot
-adjust: config.json
+cp config.json.example config.json
 npm install
 ```
 ## Install Docker
 ```
 git clone https://github.com/RagingRectangle/NestBot.git
 cd NestBot
-adjust: config.json
+cp config.json.example config.json
 add content from docker-compose.example.yml into your docker-compose.yml
 docker-compose build nestbot
 docker-compose up -d nestbot
@@ -45,7 +45,7 @@ docker-compose logs -f -t --tail="1000" nestbot
 
 **adminIDs:** Discord user IDs who are allowed to use commands. Additional command settings can be found in the servers *Integrations* tab.
 
-**refreshCron:** [Cron schedule](https://crontab-generator.org/) for refreshing nest boards.
+**updateCron:** [Cron schedule](https://crontab-generator.org/) for refreshing nest boards.
 
 **nestBoardCommand:** Slash command name. Use only lowercase.
 

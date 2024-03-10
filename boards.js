@@ -127,6 +127,7 @@ module.exports = {
           });
         nestEmbed.setImage(`${config.tileServerURL}/staticmap/pregenerated/${res.text}`);
       } catch (err) {
+        console.error(`Map error for area ${areaName}`);
         console.error(err);
       }
     }

@@ -66,7 +66,7 @@ client.on('ready', async () => {
 
   //Auto update cron
   try {
-    const updateNestsJob = schedule.scheduleJob('updateNestsJob', config.refreshCron, function () {
+    const updateNestsJob = schedule.scheduleJob('updateNestsJob', config.refreshCron ? config.refreshCron : config.updateCron , function () {
       cronUpdates();
     });
   } catch (err) {
