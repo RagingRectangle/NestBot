@@ -127,7 +127,7 @@ client.on('interactionCreate', async interaction => {
 //Update area names
 async function updateAreas(query) {
   let connection = mysql.createConnection(config.nest_db);
-  let areaQuery = `SELECT area_name FROM golbat.nests GROUP BY area_name;`;
+  let areaQuery = `SELECT area_name FROM nests GROUP BY area_name;`;
   return new Promise((resolve, reject) => {
     connection.query(areaQuery, (error, results) => {
       if (error) {
