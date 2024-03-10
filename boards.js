@@ -30,8 +30,8 @@ module.exports = {
       var nestInfo = areaResults[a];
       //Pokemon name
       let pokeInfo = master.monsters[`${nestInfo['pokemon_id']}_${nestInfo['pokemon_form']}`];
-      let pokeNameTranslation = master.translations[config.language].pokemon[`poke_${nestInfo['pokemon_id']}`];
-      let pokeFormTranslation = master.translations[config.language].forms[`form_${nestInfo['pokemon_form']}`];
+      let pokeNameTranslation = master.translations[config.language ? config.language : 'en'].pokemon[`poke_${nestInfo['pokemon_id']}`];
+      let pokeFormTranslation = master.translations[config.language ? config.language : 'en'].forms[`form_${nestInfo['pokemon_form']}`];
       var pokemonName = pokeNameTranslation;
       if (pokeInfo.form.name && !config.ignoredFormNames.includes(pokeInfo.form.name)) {
         pokemonName = pokemonName.concat(` ${pokeFormTranslation}`);
