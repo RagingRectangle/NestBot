@@ -19,7 +19,7 @@
   "areaNameLink": true,
   "linkFormat": "https://maps.google.com/maps?q={{lat}},{{lon}}",
   "titleFormat": "{{area}} Nests (~avg/hour)",
-  "boardFormat": "#{{id}} {{pokemon}}{{shiny}} {{type}} ({{avg}}) {{name}}",
+  "boardFormat": "#{{dex}} {{pokemon}}{{shiny}} {{type}} ({{avg}}) {{name}}",
   "ignoredFormNames": ["Normal"],
   "replaceUnderscores": true,
   "language": "en",
