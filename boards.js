@@ -109,9 +109,7 @@ module.exports = {
     var miniMapLink = '';
 
     //Create embed
-    nestEmbed = new EmbedBuilder().setTitle(title).setDescription(boardEntries.join('\n')).setFooter({
-      text: moment().add(config.footerOffset, 'hours').format(config.footerFormat)
-    });
+    nestEmbed = new EmbedBuilder().setTitle(title).setDescription(boardEntries.join('\n')).setTimestamp();
 
     //Create minimap
     if (config.tileServerURL) {

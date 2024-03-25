@@ -23,8 +23,6 @@
   "ignoredFormNames": ["Normal"],
   "replaceUnderscores": true,
   "language": "en",
-  "footerFormat": "llll",
-  "footerOffset": 0,
   "tileServerURL": "",
   "tileWidth": 1000,
   "tileHeight": 600,
