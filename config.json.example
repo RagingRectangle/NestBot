@@ -26,6 +26,7 @@
   "tileServerURL": "",
   "tileWidth": 1000,
   "tileHeight": 600,
+  "noNestsFound": "No nests found.",
   "emojis": {
     "type-grass": "🌿",
     "type-poison": "☠",

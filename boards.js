@@ -26,6 +26,8 @@ module.exports = {
     var markers = [];
     var points = [];
 
+
+
     for (var a = 0; a < areaResults.length; a++) {
       var nestInfo = areaResults[a];
       //Pokemon name
@@ -111,8 +113,13 @@ module.exports = {
     //Create embed
     nestEmbed = new EmbedBuilder().setTitle(title).setDescription(boardEntries.join('\n')).setTimestamp();
 
-    //Create minimap
-    if (config.tileServerURL) {
+    //No nests
+    if (areaResults.length == 0) {
+      nestEmbed.setDescription(config.noNestsFound ? config.noNestsFound : 'No nests found.');
+      return [nestEmbed, areaName];
+    }
+    //Nests with map
+    else if (config.tileServerURL) {
       try {
         const res = await superagent.post(`${config.tileServerURL}/staticmap/nest-bot?pregenerate=true&regeneratable=true`)
           .send({
@@ -128,9 +135,12 @@ module.exports = {
         console.error(`Map error for area ${areaName}`);
         console.error(err);
       }
+      return [nestEmbed, areaName];
     }
-
-    return [nestEmbed, areaName];
+    //Nests without map
+    else {
+      return [nestEmbed, areaName];
+    }
   }, //End of fetchAreaNests()
 
 
