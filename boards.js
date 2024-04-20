@@ -26,6 +26,7 @@ module.exports = {
     var markers = [];
     var points = [];
     var geofences = [];
+    
       
     for (var a = 0; a < areaResults.length; a++) {
       var nestInfo = areaResults[a];
@@ -212,7 +213,7 @@ module.exports = {
   }, //End of findCenterZoom()
 
   //Run query
-  runQuery: async function runQuery(config, query) {  
+  runQuery: async function runQuery(config, query) {
     let connection = mysql.createConnection(config.nest_db);
     return new Promise((resolve, reject) => {
       connection.query(query, (error, results) => {
