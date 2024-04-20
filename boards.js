@@ -13,7 +13,7 @@ const superagent = require('superagent');
 
 module.exports = {
   fetchAreaNests: async function fetchAreaNests(client, areaName, config, master, shinies) {
-    var areaQuery = `SELECT lat, lon, name, area_name, pokemon_id, pokemon_form, pokemon_avg FROM nests WHERE pokemon_id > 0 AND pokemon_avg >= ${config.minimumAverage} AND area_name = "${areaName}"`
+    var areaQuery = `SELECT lat, lon, polygon, name, area_name, pokemon_id, pokemon_form, pokemon_avg FROM nests WHERE pokemon_id > 0 AND pokemon_avg >= ${config.minimumAverage} AND area_name = "${areaName}"`
     if (config.includeUnknown == false) {
       areaQuery = areaQuery.concat(` AND name != ${config.renameUnknownFrom}`);
     }
@@ -25,9 +25,8 @@ module.exports = {
     var areaNests = [];
     var markers = [];
     var points = [];
-
-
-
+    var geofences = [];
+      
     for (var a = 0; a < areaResults.length; a++) {
       var nestInfo = areaResults[a];
       //Pokemon name
@@ -98,6 +97,21 @@ module.exports = {
         latitude: areaNests[n]['lat'],
         longitude: areaNests[n]['lon']
       });
+
+      if (config.showGeofences && areaNests[n]['polygon'].length > 0) {
+        for (const geofence of areaNests[n]['polygon']) {
+          if (geofence.length > 1) {
+            var coords = geofence
+            .filter(obj => obj.x !== undefined || obj.y !== undefined)
+            .map(obj => [obj.y, obj.x])
+
+            if (coords.length > 0) {
+              geofences.push(coords)
+            }
+          }
+        }
+      }
+      
     } //End of n loop
 
     //Create title
@@ -128,7 +142,8 @@ module.exports = {
             "lat": tileData.latitude,
             "lon": tileData.longitude,
             "zoom": tileData.zoom,
-            "nestjson": markers
+            "nestjson": markers,
+            "poly_path": geofences
           });
         nestEmbed.setImage(`${config.tileServerURL}/staticmap/pregenerated/${res.text}`);
       } catch (err) {
@@ -164,7 +179,7 @@ module.exports = {
     const longitude = minLon + ((maxLon - minLon) / 2.0)
     const ne = [maxLat, maxLon]
     const sw = [minLat, minLon]
-    if (ne === sw) {
+    if (ne[0] === sw[0] && ne[1] === sw[1]) {
       return {
         zoom: defaultZoom,
         latitude: lats[0],
@@ -197,7 +212,7 @@ module.exports = {
   }, //End of findCenterZoom()
 
   //Run query
-  runQuery: async function runQuery(config, query) {
+  runQuery: async function runQuery(config, query) {  
     let connection = mysql.createConnection(config.nest_db);
     return new Promise((resolve, reject) => {
       connection.query(query, (error, results) => {
