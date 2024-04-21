@@ -126,7 +126,12 @@ module.exports = {
     var miniMapLink = '';
 
     //Create embed
-    nestEmbed = new EmbedBuilder().setTitle(title).setDescription(boardEntries.join('\n')).setTimestamp();
+    if (boardEntries.length > 0) {
+      nestEmbed = new EmbedBuilder().setTitle(title).setDescription(''+boardEntries.join('\n')).setTimestamp();
+    }
+    else {
+      nestEmbed = new EmbedBuilder().setTitle(title).setTimestamp();
+    }
 
     //No nests
     if (areaResults.length == 0) {
@@ -190,7 +195,7 @@ module.exports = {
 
     function latRad(lat) {
       const sin = Math.sin(lat * Math.PI / 180.0)
-      const rad = Math.log((1.0 + sin) / (1.0 - sin)) / 2.0
+      const rad = Math.log((1.0 + sin) / (1.0 - sin)) / 2.0 
       return Math.max(Math.min(rad, Math.PI), -Math.PI) / 2.0
     }
 
