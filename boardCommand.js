@@ -13,8 +13,10 @@ module.exports = {
             option.setName('area')
             .setDescription('Select nest area')
             .setRequired(true)
-            .setAutocomplete(true)),
-
+            .setAutocomplete(true))
+        .addStringOption(option =>
+            option.setName('display-name')
+            .setDescription('Display name of an area')),
 
     async execute(client, interaction, config, master, shinies) {
         await interaction.reply({
@@ -33,5 +35,5 @@ module.exports = {
                 }
                 fs.writeFileSync('./nestBoards.json', JSON.stringify(nestBoards));
             }).catch(console.error);
-    }, //End of execute()
+    }, //End of execute()  
 };

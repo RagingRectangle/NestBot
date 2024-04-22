@@ -13,7 +13,8 @@ const superagent = require('superagent');
 
 module.exports = {
   fetchAreaNests: async function fetchAreaNests(client, areaName, config, master, shinies) {
-    var areaQuery = `SELECT lat, lon, polygon, name, area_name, pokemon_id, pokemon_form, pokemon_avg FROM nests WHERE pokemon_id > 0 AND pokemon_avg >= ${config.minimumAverage} AND area_name = "${areaName}"`
+    // TODO: Fix sql query & Update area name
+    var areaQuery = `SELECT lat, lon, polygon, name, area_name, pokemon_id, pokemon_form, pokemon_avg FROM nests WHERE pokemon_id > 0 AND pokemon_avg >= ${config.minimumAverage} AND area_name IN (${areaName})`
     if (config.includeUnknown == false) {
       areaQuery = areaQuery.concat(` AND name != ${config.renameUnknownFrom}`);
     }

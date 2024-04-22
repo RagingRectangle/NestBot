@@ -96,7 +96,7 @@ async function cronUpdates() {
 //AutoComplete
 client.on('interactionCreate', async interaction => {
   if (!interaction.isAutocomplete()) return;
-  let focusedValue = await interaction.options.getFocused().toLowerCase();
+  let focusedValue = await interaction.options.getFocused();
   for (var i in interaction.options._hoistedOptions) {
     if (!interaction.options._hoistedOptions[i]['focused'] == true) {
       continue;
@@ -105,8 +105,16 @@ client.on('interactionCreate', async interaction => {
     try {
       //Area names
       if (optionName == 'area') {
-        let filteredList = areaNames.filter(choice => choice.toLowerCase().includes(focusedValue)).slice(0, 25);
-        sendAutoResponse(filteredList);
+        let filteredList = areaNames.filter(choice => {
+            return !focusedValue.toLowerCase().split(',').includes(choice.toLowerCase()) &&
+             choice.toLowerCase().includes(focusedValue.toLowerCase().split(',').slice(-1))
+          }).slice(0, 25);
+        let suggestions = filteredList.map(newArea => {
+           selectedAreas = focusedValue.split(',')
+           selectedAreas[selectedAreas.length -1] = newArea
+           return selectedAreas.join(',')
+        });
+        sendAutoResponse(suggestions)
       }
     } catch (err) {
       console.log(`Error generating area names: ${err}`);
