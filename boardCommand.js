@@ -12,7 +12,6 @@ module.exports = {
         .addStringOption(option =>
             option.setName('area')
             .setDescription('Select nest area')
-            .setRequired(true)
             .setAutocomplete(true))
         .addStringOption(option =>
             option.setName('display-name')
