@@ -12,9 +12,11 @@ var mysql = require('mysql2');
 const superagent = require('superagent');
 
 module.exports = {
-  fetchAreaNests: async function fetchAreaNests(client, areaName, config, master, shinies) {
-    // TODO: Fix sql query & Update area name
-    var areaQuery = `SELECT lat, lon, polygon, name, area_name, pokemon_id, pokemon_form, pokemon_avg FROM nests WHERE pokemon_id > 0 AND pokemon_avg >= ${config.minimumAverage} AND area_name IN (${areaName})`
+  fetchAreaNests: async function fetchAreaNests(client, options, config, master, shinies) {
+    var areaQueryString = options['areaName'].split(',').map(area => `"${area}"`).join(',')
+    var minimumAverage = options['minAverage'] || config.defaultAverage;
+    
+    var areaQuery = `SELECT lat, lon, polygon, name, area_name, pokemon_id, pokemon_form, pokemon_avg FROM nests WHERE pokemon_id > 0 AND pokemon_avg >= ${minimumAverage} AND area_name IN (${areaQueryString})`
     if (config.includeUnknown == false) {
       areaQuery = areaQuery.concat(` AND name != ${config.renameUnknownFrom}`);
     }
@@ -117,7 +119,8 @@ module.exports = {
     } //End of n loop
 
     //Create title
-    var title = config.titleFormat.replace('{{area}}', areaName);
+    let titleString = options['displayName'] || options['areaName'];
+    var title = config.titleFormat.replace('{{area}}', titleString);
     if (config.replaceUnderscores == true) {
       var title = title.replaceAll('_', ' ');
     }
@@ -137,7 +140,7 @@ module.exports = {
     //No nests
     if (areaResults.length == 0) {
       nestEmbed.setDescription(config.noNestsFound ? config.noNestsFound : 'No nests found.');
-      return [nestEmbed, areaName];
+      return nestEmbed;
     }
     //Nests with map
     else if (config.tileServerURL) {
@@ -154,14 +157,14 @@ module.exports = {
           });
         nestEmbed.setImage(`${config.tileServerURL}/staticmap/pregenerated/${res.text}`);
       } catch (err) {
-        console.error(`Map error for area ${areaName}`);
+        console.error(`Map error for area ${areas}`);
         console.error(err);
       }
-      return [nestEmbed, areaName];
+      return nestEmbed;
     }
     //Nests without map
     else {
-      return [nestEmbed, areaName];
+      return nestEmbed;
     }
   }, //End of fetchAreaNests()
 

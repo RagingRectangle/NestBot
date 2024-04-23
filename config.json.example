@@ -15,7 +15,7 @@
   "includeUnknown": true,
   "renameUnknownFrom": "unknown",
   "renameUnknownTo": "Unknown",
-  "minimumAverage": 3,
+  "defaultAverage": 3,
   "averageToFixed": 1,
   "areaNameLink": true,
   "linkFormat": "https://maps.google.com/maps?q={{lat}},{{lon}}",

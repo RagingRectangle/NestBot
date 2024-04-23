@@ -80,11 +80,11 @@ async function cronUpdates() {
   var nestBoards = JSON.parse(fs.readFileSync('./nestBoards.json'));
   for (const [msgID, msgInfo] of Object.entries(nestBoards)) {
     try {
-      let nestEmbedInfo = await Boards.fetchAreaNests(client, msgInfo.areaName, config, master, shinies);
+      let nestEmbedInfo = await Boards.fetchAreaNests(client, msgInfo, config, master, shinies);
       let channel = await client.channels.fetch(msgInfo.channelId).catch(console.error);
       let message = await channel.messages.fetch(msgID);
       await message.edit({
-        embeds: [nestEmbedInfo[0]],
+        embeds: [nestEmbedInfo],
       }).catch(console.error);
     } catch (err) {
       console.log(err);
