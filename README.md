@@ -81,7 +81,19 @@ docker-compose logs -f -t --tail="1000" nestbot
 
 **tileWidth/tileHeight:** Size of generated map in pixels.
 
+**showGeofences:** Option to draw geofences around nests (true/false).
+
+**scalePokemon:** Option to scale pokemon size on the board depending on average spawn count (true/false).
+
+**scaleMinSize:** Minimum scale of pokemon markers (default 30).
+
+**scaleMaxSize:** Maximum scale of pokemon markers (default 60).
+
+**noNestsFound:** "No nests found.",
+
 **emojis:** Same format as Poracle if you'd like to copy custom emojis over for types (Will decrease max number of nests shown).
+
+## Commands
 
 
 ## Usage Normal

@@ -12,26 +12,41 @@ module.exports = {
         .addStringOption(option =>
             option.setName('area')
             .setDescription('Select nest area')
-            .setRequired(true)
-            .setAutocomplete(true)),
-
+            .setAutocomplete(true))
+        .addStringOption(option =>
+            option.setName('display-name')
+            .setDescription('Display name of an area'))
+        .addStringOption(option =>
+            option.setName('min-average')
+            .setDescription('Minumum average of spawns per hour'))
+        .addBooleanOption(option =>
+            option.setName("show-geofences")
+            .setDescription("Draw geofence around nests"))
+        .addBooleanOption(option =>
+            option.setName("scale-pokemon")
+            .setDescription("Scale pokemon by nest spawn frequency")),
 
     async execute(client, interaction, config, master, shinies) {
         await interaction.reply({
             content: 'Generating nest board...'
         }).catch(console.error);
-        let nestEmbedInfo = await Boards.fetchAreaNests(client, interaction.options.getString('area'), config, master, shinies);
+        options = {
+            areaName: interaction.options.getString('area'),
+            displayName: interaction.options.getString('display-name'),
+            minAverage: interaction.options.getString('min-average'),
+            showGeofences: interaction.options.getBoolean('show-geofences'),
+            scalePokemon: interaction.options.getBoolean('scale-pokemon')
+        }
+        let nestEmbedInfo = await Boards.fetchAreaNests(client, options, config, master, shinies);
         await interaction.deleteReply().catch(console.error);
         await interaction.channel.send({
-                embeds: [nestEmbedInfo[0]]
+                embeds: [nestEmbedInfo]
             })
             .then(msg => {
                 var nestBoards = JSON.parse(fs.readFileSync('./nestBoards.json'));
-                nestBoards[msg.id] = {
-                    channelId: msg.channelId,
-                    areaName: interaction.options.getString('area')
-                }
+                options.channelId = msg.channelId
+                nestBoards[msg.id] = options
                 fs.writeFileSync('./nestBoards.json', JSON.stringify(nestBoards));
             }).catch(console.error);
-    }, //End of execute()
+    }, //End of execute()  
 };

@@ -12,8 +12,13 @@ var mysql = require('mysql2');
 const superagent = require('superagent');
 
 module.exports = {
-  fetchAreaNests: async function fetchAreaNests(client, areaName, config, master, shinies) {
-    var areaQuery = `SELECT lat, lon, polygon, name, area_name, pokemon_id, pokemon_form, pokemon_avg FROM nests WHERE pokemon_id > 0 AND pokemon_avg >= ${config.minimumAverage} AND area_name = "${areaName}"`
+  fetchAreaNests: async function fetchAreaNests(client, options, config, master, shinies) {
+    var minimumAverage = options['minAverage'] || config.defaultAverage;
+    var areaQuery = `SELECT lat, lon, polygon, name, area_name, pokemon_id, pokemon_form, pokemon_avg FROM nests WHERE pokemon_id > 0 AND pokemon_avg >= ${minimumAverage}`
+    if (options['areaName'] != undefined) {
+      var areas = options['areaName'].split(',').map(area => `"${area}"`).join(',')
+      areaQuery = areaQuery.concat(` AND area_name IN (${areas})`);
+    }
     if (config.includeUnknown == false) {
       areaQuery = areaQuery.concat(` AND name != ${config.renameUnknownFrom}`);
     }
@@ -26,6 +31,7 @@ module.exports = {
     var markers = [];
     var points = [];
     var geofences = [];
+    var pokemonScales = []
 
 
     for (var a = 0; a < areaResults.length; a++) {
@@ -93,30 +99,36 @@ module.exports = {
         break;
       }
 
-      markers.push([areaNests[n]['pokemon_id'], areaNests[n]['pokemon_form'], areaNests[n]['lat'], areaNests[n]['lon']]);
+      var scalePokemon = options['scalePokemon'] != undefined ? options['scalePokemon'] : config.showGeofences;
+      var markerSize = 30
+      if (scalePokemon) {
+        markerSize = Math.round(Math.max(Math.min(areaNests[n]['pokemon_avg'], config.scaleMaxSize), config.scaleMinSize));
+      }
+
+      markers.push([areaNests[n]['pokemon_id'], areaNests[n]['pokemon_form'], areaNests[n]['lat'], areaNests[n]['lon'], markerSize]);
       points.push({
         latitude: areaNests[n]['lat'],
         longitude: areaNests[n]['lon']
       });
 
-      if (config.showGeofences && areaNests[n]['polygon'].length > 0) {
+      var showGeofences = options['showGeofences'] != undefined ? options['showGeofences'] : config.showGeofences;
+      if (showGeofences && areaNests[n]['polygon'].length > 0) {
         for (const geofence of areaNests[n]['polygon']) {
           if (geofence.length > 1) {
             var coords = geofence
             .filter(obj => obj.x !== undefined || obj.y !== undefined)
             .map(obj => [obj.y, obj.x])
-
             if (coords.length > 0) {
               geofences.push(coords)
             }
           }
         }
-      }
-      
+      }      
     } //End of n loop
 
     //Create title
-    var title = config.titleFormat.replace('{{area}}', areaName);
+    let titleString = options['displayName'] || options['areaName'];
+    var title = config.titleFormat.replace('{{area}}', titleString);
     if (config.replaceUnderscores == true) {
       var title = title.replaceAll('_', ' ');
     }
@@ -136,7 +148,7 @@ module.exports = {
     //No nests
     if (areaResults.length == 0) {
       nestEmbed.setDescription(config.noNestsFound ? config.noNestsFound : 'No nests found.');
-      return [nestEmbed, areaName];
+      return nestEmbed;
     }
     //Nests with map
     else if (config.tileServerURL) {
@@ -153,14 +165,14 @@ module.exports = {
           });
         nestEmbed.setImage(`${config.tileServerURL}/staticmap/pregenerated/${res.text}`);
       } catch (err) {
-        console.error(`Map error for area ${areaName}`);
+        console.error(`Map error for area ${areas}`);
         console.error(err);
       }
-      return [nestEmbed, areaName];
+      return nestEmbed;
     }
     //Nests without map
     else {
-      return [nestEmbed, areaName];
+      return nestEmbed;
     }
   }, //End of fetchAreaNests()
 
