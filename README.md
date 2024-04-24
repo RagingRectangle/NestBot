@@ -55,7 +55,7 @@ docker-compose logs -f -t --tail="1000" nestbot
 
 **renameUnknownFrom/renameUnknownTo:** Use these options to rename the default unknown nest names.
 
-**minimumAverage:** The minimum hourly average to display in boards.
+**defaultAverage:** The minimum hourly average to display in boards.
 
 **averageToFixed:** How many decimals to include in averages.
 
@@ -95,6 +95,11 @@ docker-compose logs -f -t --tail="1000" nestbot
 
 ## Commands
 
+- **area** - Select the area of the nest. Multiple areas can be selected by comma separation. Leave empty for all areas.
+- **display-name** - Overwrites the display name in the title. Useful for multi-area boards.
+- **min-average** - Overwrites the `defaultAverage` option in the config. Useful for if boards of various scale are used.
+- **show-geofence** - Overwrites the `showGeofences` option in the config. Useful for large areas with many nests to reduce Tileserver load.
+- **scale-pokemon** - Overwrites the `scalePokemon` option in the config. Useful to disable scaling on small areas.
 
 ## Usage Normal
 - Start the bot in a console with `node nests.js`.
