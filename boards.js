@@ -113,12 +113,24 @@ module.exports = {
       var showGeofences = options['showGeofences'] != undefined ? options['showGeofences'] : config.showGeofences;
       if (showGeofences && areaNests[n]['polygon'].length > 0) {
         for (const geofence of areaNests[n]['polygon']) {
-          if (geofence.length > 1) {
+          // single polygon
+          if (geofence.length > 1 && geofence[0].x !== undefined) {
             var coords = geofence
             .filter(obj => obj.x !== undefined || obj.y !== undefined)
             .map(obj => [obj.y, obj.x])
             if (coords.length > 0) {
               geofences.push(coords)
+            }
+          }
+          // multi polygon
+          else {
+            for (const polygon of geofence) {
+              var coords = polygon
+              .filter(obj => obj.x !== undefined || obj.y !== undefined)
+              .map(obj => [obj.y, obj.x])
+              if (coords.length > 0) {
+                geofences.push(coords)
+              }                
             }
           }
         }
