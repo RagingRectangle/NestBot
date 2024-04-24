@@ -18,7 +18,10 @@ module.exports = {
             .setDescription('Display name of an area'))
         .addStringOption(option =>
             option.setName('min-average')
-            .setDescription('Minumum average of spawns per hour')),
+            .setDescription('Minumum average of spawns per hour'))
+        .addBooleanOption(option =>
+            option.setName("show-geofences")
+            .setDescription("Draw geofence around nests")),
 
     async execute(client, interaction, config, master, shinies) {
         await interaction.reply({
@@ -27,7 +30,8 @@ module.exports = {
         options = {
             areaName: interaction.options.getString('area'),
             displayName: interaction.options.getString('display-name'),
-            minAverage: interaction.options.getString('min-average')
+            minAverage: interaction.options.getString('min-average'),
+            showGeofences: interaction.options.getBoolean('show-geofences')
         }
         let nestEmbedInfo = await Boards.fetchAreaNests(client, options, config, master, shinies);
         await interaction.deleteReply().catch(console.error);

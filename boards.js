@@ -104,13 +104,13 @@ module.exports = {
         longitude: areaNests[n]['lon']
       });
 
-      if (config.showGeofences && areaNests[n]['polygon'].length > 0) {
+      var showGeofences = options['showGeofences'] != undefined ? options['showGeofences'] : config.showGeofences;
+      if (showGeofences && areaNests[n]['polygon'].length > 0) {
         for (const geofence of areaNests[n]['polygon']) {
           if (geofence.length > 1) {
             var coords = geofence
             .filter(obj => obj.x !== undefined || obj.y !== undefined)
             .map(obj => [obj.y, obj.x])
-
             if (coords.length > 0) {
               geofences.push(coords)
             }
