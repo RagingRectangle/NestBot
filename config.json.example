@@ -28,6 +28,9 @@
   "tileWidth": 1000,
   "tileHeight": 600,
   "showGeofences": true,
+  "scalePokemon": true,
+  "scaleMinSize": 30,
+  "scaleMaxSize": 60,
   "noNestsFound": "No nests found.",
   "emojis": {
     "type-grass": "🌿",

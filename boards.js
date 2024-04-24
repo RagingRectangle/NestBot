@@ -31,6 +31,7 @@ module.exports = {
     var markers = [];
     var points = [];
     var geofences = [];
+    var pokemonScales = []
 
 
     for (var a = 0; a < areaResults.length; a++) {
@@ -98,7 +99,13 @@ module.exports = {
         break;
       }
 
-      markers.push([areaNests[n]['pokemon_id'], areaNests[n]['pokemon_form'], areaNests[n]['lat'], areaNests[n]['lon']]);
+      var scalePokemon = options['scalePokemon'] != undefined ? options['scalePokemon'] : config.showGeofences;
+      var markerSize = 30
+      if (scalePokemon) {
+        markerSize = Math.round(Math.max(Math.min(areaNests[n]['pokemon_avg'], config.scaleMaxSize), config.scaleMinSize));
+      }
+
+      markers.push([areaNests[n]['pokemon_id'], areaNests[n]['pokemon_form'], areaNests[n]['lat'], areaNests[n]['lon'], markerSize]);
       points.push({
         latitude: areaNests[n]['lat'],
         longitude: areaNests[n]['lon']
@@ -116,8 +123,7 @@ module.exports = {
             }
           }
         }
-      }
-      
+      }      
     } //End of n loop
 
     //Create title
