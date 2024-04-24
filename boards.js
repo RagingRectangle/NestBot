@@ -31,9 +31,8 @@ module.exports = {
     var markers = [];
     var points = [];
     var geofences = [];
-    var pokemonScales = []
 
-
+    
     for (var a = 0; a < areaResults.length; a++) {
       var nestInfo = areaResults[a];
       //Pokemon name
