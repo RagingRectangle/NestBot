@@ -89,8 +89,10 @@ module.exports = {
         nestName = `[${areaNests[n]['name']}](${nestLink})`;
       }
 
-      let nestEntry = config.boardFormat.replace('{{dex}}', areaNests[n]['pokemon_id']).replace('{{pokemon}}', areaNests[n]['pokemonName']).replace('{{shiny}}', areaNests[n]['shiny']).replace('{{type}}', areaNests[n]['type']).replace('{{avg}}', areaNests[n]['pokemon_avg'].toFixed(config.averageToFixed)).replace('{{name}}', nestName);
-      boardEntries.push(nestEntry);
+      if (options['showDescription']) {
+        let nestEntry = config.boardFormat.replace('{{dex}}', areaNests[n]['pokemon_id']).replace('{{pokemon}}', areaNests[n]['pokemonName']).replace('{{shiny}}', areaNests[n]['shiny']).replace('{{type}}', areaNests[n]['type']).replace('{{avg}}', areaNests[n]['pokemon_avg'].toFixed(config.averageToFixed)).replace('{{name}}', nestName);
+        boardEntries.push(nestEntry);
+      }
 
       //Check length
       if (boardEntries.join('\n').length > 4096) {

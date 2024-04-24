@@ -24,7 +24,10 @@ module.exports = {
             .setDescription("Draw geofence around nests"))
         .addBooleanOption(option =>
             option.setName("scale-pokemon")
-            .setDescription("Scale pokemon by nest spawn frequency")),
+            .setDescription("Scale pokemon by nest spawn frequency"))
+        .addBooleanOption(option =>
+            option.setName("show-description")
+            .setDescription("Show description")),
 
     async execute(client, interaction, config, master, shinies) {
         await interaction.reply({
@@ -35,7 +38,8 @@ module.exports = {
             displayName: interaction.options.getString('display-name'),
             minAverage: interaction.options.getString('min-average'),
             showGeofences: interaction.options.getBoolean('show-geofences'),
-            scalePokemon: interaction.options.getBoolean('scale-pokemon')
+            scalePokemon: interaction.options.getBoolean('scale-pokemon'),
+            showDescription: interaction.options.getBoolean('show-description')
         }
         let nestEmbedInfo = await Boards.fetchAreaNests(client, options, config, master, shinies);
         await interaction.deleteReply().catch(console.error);
