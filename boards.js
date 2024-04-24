@@ -12,8 +12,13 @@ var mysql = require('mysql2');
 const superagent = require('superagent');
 
 module.exports = {
-  fetchAreaNests: async function fetchAreaNests(client, areaName, config, master, shinies) {
-    var areaQuery = `SELECT lat, lon, name, area_name, pokemon_id, pokemon_form, pokemon_avg FROM nests WHERE pokemon_id > 0 AND pokemon_avg >= ${config.minimumAverage} AND area_name = "${areaName}"`
+  fetchAreaNests: async function fetchAreaNests(client, options, config, master, shinies) {
+    var minimumAverage = options['minAverage'] || config.defaultAverage;
+    var areaQuery = `SELECT lat, lon, polygon, name, area_name, pokemon_id, pokemon_form, pokemon_avg FROM nests WHERE pokemon_id > 0 AND pokemon_avg >= ${minimumAverage}`
+    if (options['areaName'] != undefined) {
+      var areas = options['areaName'].split(',').map(area => `"${area}"`).join(',')
+      areaQuery = areaQuery.concat(` AND area_name IN (${areas})`);
+    }
     if (config.includeUnknown == false) {
       areaQuery = areaQuery.concat(` AND name != ${config.renameUnknownFrom}`);
     }
@@ -25,9 +30,9 @@ module.exports = {
     var areaNests = [];
     var markers = [];
     var points = [];
+    var geofences = [];
 
-
-
+    
     for (var a = 0; a < areaResults.length; a++) {
       var nestInfo = areaResults[a];
       //Pokemon name
@@ -84,8 +89,10 @@ module.exports = {
         nestName = `[${areaNests[n]['name']}](${nestLink})`;
       }
 
-      let nestEntry = config.boardFormat.replace('{{dex}}', areaNests[n]['pokemon_id']).replace('{{pokemon}}', areaNests[n]['pokemonName']).replace('{{shiny}}', areaNests[n]['shiny']).replace('{{type}}', areaNests[n]['type']).replace('{{avg}}', areaNests[n]['pokemon_avg'].toFixed(config.averageToFixed)).replace('{{name}}', nestName);
-      boardEntries.push(nestEntry);
+      if (options['showDescription']) {
+        let nestEntry = config.boardFormat.replace('{{dex}}', areaNests[n]['pokemon_id']).replace('{{pokemon}}', areaNests[n]['pokemonName']).replace('{{shiny}}', areaNests[n]['shiny']).replace('{{type}}', areaNests[n]['type']).replace('{{avg}}', areaNests[n]['pokemon_avg'].toFixed(config.averageToFixed)).replace('{{name}}', nestName);
+        boardEntries.push(nestEntry);
+      }
 
       //Check length
       if (boardEntries.join('\n').length > 4096) {
@@ -93,15 +100,48 @@ module.exports = {
         break;
       }
 
-      markers.push([areaNests[n]['pokemon_id'], areaNests[n]['pokemon_form'], areaNests[n]['lat'], areaNests[n]['lon']]);
+      var scalePokemon = options['scalePokemon'] != undefined ? options['scalePokemon'] : config.showGeofences;
+      var markerSize = 30
+      if (scalePokemon) {
+        markerSize = Math.round(Math.max(Math.min(areaNests[n]['pokemon_avg'], config.scaleMaxSize), config.scaleMinSize));
+      }
+
+      markers.push([areaNests[n]['pokemon_id'], areaNests[n]['pokemon_form'], areaNests[n]['lat'], areaNests[n]['lon'], markerSize]);
       points.push({
         latitude: areaNests[n]['lat'],
         longitude: areaNests[n]['lon']
       });
+
+      var showGeofences = options['showGeofences'] != undefined ? options['showGeofences'] : config.showGeofences;
+      if (showGeofences && areaNests[n]['polygon'].length > 0) {
+        for (const geofence of areaNests[n]['polygon']) {
+          // single polygon
+          if (geofence.length > 1 && geofence[0].x !== undefined) {
+            var coords = geofence
+            .filter(obj => obj.x !== undefined || obj.y !== undefined)
+            .map(obj => [obj.y, obj.x])
+            if (coords.length > 0) {
+              geofences.push(coords)
+            }
+          }
+          // multi polygon
+          else {
+            for (const polygon of geofence) {
+              var coords = polygon
+              .filter(obj => obj.x !== undefined || obj.y !== undefined)
+              .map(obj => [obj.y, obj.x])
+              if (coords.length > 0) {
+                geofences.push(coords)
+              }                
+            }
+          }
+        }
+      }      
     } //End of n loop
 
     //Create title
-    var title = config.titleFormat.replace('{{area}}', areaName);
+    let titleString = options['displayName'] || options['areaName'];
+    var title = config.titleFormat.replace('{{area}}', titleString);
     if (config.replaceUnderscores == true) {
       var title = title.replaceAll('_', ' ');
     }
@@ -111,12 +151,17 @@ module.exports = {
     var miniMapLink = '';
 
     //Create embed
-    nestEmbed = new EmbedBuilder().setTitle(title).setDescription(boardEntries.join('\n')).setTimestamp();
+    if (boardEntries.length > 0) {
+      nestEmbed = new EmbedBuilder().setTitle(title).setDescription(''+boardEntries.join('\n')).setTimestamp();
+    }
+    else {
+      nestEmbed = new EmbedBuilder().setTitle(title).setTimestamp();
+    }
 
     //No nests
     if (areaResults.length == 0) {
       nestEmbed.setDescription(config.noNestsFound ? config.noNestsFound : 'No nests found.');
-      return [nestEmbed, areaName];
+      return nestEmbed;
     }
     //Nests with map
     else if (config.tileServerURL) {
@@ -128,18 +173,19 @@ module.exports = {
             "lat": tileData.latitude,
             "lon": tileData.longitude,
             "zoom": tileData.zoom,
-            "nestjson": markers
+            "nestjson": markers,
+            "poly_path": geofences
           });
         nestEmbed.setImage(`${config.tileServerURL}/staticmap/pregenerated/${res.text}`);
       } catch (err) {
-        console.error(`Map error for area ${areaName}`);
+        console.error(`Map error for area ${areas}`);
         console.error(err);
       }
-      return [nestEmbed, areaName];
+      return nestEmbed;
     }
     //Nests without map
     else {
-      return [nestEmbed, areaName];
+      return nestEmbed;
     }
   }, //End of fetchAreaNests()
 
@@ -164,7 +210,7 @@ module.exports = {
     const longitude = minLon + ((maxLon - minLon) / 2.0)
     const ne = [maxLat, maxLon]
     const sw = [minLat, minLon]
-    if (ne === sw) {
+    if (ne[0] === sw[0] && ne[1] === sw[1]) {
       return {
         zoom: defaultZoom,
         latitude: lats[0],
@@ -174,7 +220,7 @@ module.exports = {
 
     function latRad(lat) {
       const sin = Math.sin(lat * Math.PI / 180.0)
-      const rad = Math.log((1.0 + sin) / (1.0 - sin)) / 2.0
+      const rad = Math.log((1.0 + sin) / (1.0 - sin)) / 2.0 
       return Math.max(Math.min(rad, Math.PI), -Math.PI) / 2.0
     }
 

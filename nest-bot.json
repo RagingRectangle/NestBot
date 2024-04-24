@@ -14,9 +14,27 @@
           "fallback_url": "https://raw.githubusercontent.com/whitewillem/PogoAssets/main/uicons/pokemon/#index(nest, 0).png",
           "latitude": #index(nest, 2),
           "longitude": #index(nest, 3),
-          "width": 30,
-          "height": 30
+          "width": #index(nest, 4),
+          "height": #index(nest, 4)
       },
       #endfor
-  ]
+  ],
+  #if(poly_path != nil):
+  "polygons": [
+    #for(polygon in poly_path):
+    #if(index != 0):,#endif
+    {
+      "fill_color": "rgba(46,204,113,0.3)",
+      "stroke_color": "rgba(46,204,113)",
+      "stroke_width": 2,
+      "path":
+      [
+        #for(coord in polygon):
+        #if(index != 0):,#endif[#index(coord, 0), #index(coord, 1)]
+        #endfor
+      ]
+    }
+    #endfor
+    ],
+  #endif
 }
